@@ -4,10 +4,6 @@ pipeline {
             label "Dev"
         }
     }
-    tools {
-        maven 'kopsmaven'
-    }
-
     stages {
         stage('CleanWS') {
             steps {
@@ -17,19 +13,19 @@ pipeline {
         stage('CQA'){
             steps {
                 withSonarQubeEnv('SonarQube') {
-                  sh "mvn clean verify sonar:sonar -Dsonar.projectKey=adservice"
+                  sh "./gradlew clean build sonar -Dsonar.projectKey=adservice"
                     }
                 }
         }
         stage ('Build') {
             steps {
-                sh 'mvn clean package'
-                sh 'cp -r target Docker-app'
+                sh './gradlew clean build'
+                sh ''
             }
         }
         stage ('Artifact'){
             steps {
-                nexusArtifactUploader artifacts: [[artifactId: 'vprofile', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusCred', groupId: 'com.visualpathit', nexusUrl: '54.224.94.208:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'Docker-webapp', version: 'v2'
+                nexusArtifactUploader artifacts: [[artifactId: 'hipstershop', classifier: '', file: 'build/libs/hipstershop-0.1.0-SNAPSHOT.jar', type: 'war']], credentialsId: 'NexusCred', groupId: 'adservice', nexusUrl: '54.224.94.208:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'adservice-svc', version: '0.1.0-SNAPSHOT'
             }
         }
         stage ('DockerBuild'){
