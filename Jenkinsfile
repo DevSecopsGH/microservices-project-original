@@ -25,4 +25,10 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            slackSend channel: 'eksproject-1', message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} More info at:${env.BUILD_URL}"
+        }
+        
+    }
 }
